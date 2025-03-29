@@ -1,5 +1,9 @@
+mod commands;
+mod models;
+mod services;
+
 use clap::{Parser, Subcommand};
-use reqwest;
+use commands::{HelloCommand, IpCommand};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -25,20 +29,18 @@ async fn main() {
 
     match &cli.command {
         Commands::Hello { name } => {
-            println!("Hello {}!", name);
+            let command = HelloCommand::new(name.clone());
+            match command.execute() {
+                models::CommandResult::Success(msg) => println!("{}", msg),
+                models::CommandResult::Error(e) => eprintln!("Error: {}", e),
+            }
         }
         Commands::Ip => {
-            match get_ip().await {
-                Ok(ip) => println!("Your IP address is: {}", ip),
-                Err(e) => eprintln!("Error getting IP address: {}", e),
+            let command = IpCommand::new();
+            match command.execute().await {
+                models::CommandResult::Success(ip) => println!("Your IP address is: {}", ip),
+                models::CommandResult::Error(e) => eprintln!("Error: {}", e),
             }
         }
     }
-}
-
-async fn get_ip() -> Result<String, Box<dyn std::error::Error>> {
-    let response = reqwest::get("https://api.ipify.org?format=json").await?;
-    let json: serde_json::Value = response.json().await?;
-    let ip = json["ip"].as_str().ok_or("IP not found in response")?;
-    Ok(ip.to_string())
 }
