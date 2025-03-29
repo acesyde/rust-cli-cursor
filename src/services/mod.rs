@@ -1,6 +1,6 @@
 //! Services for external API interactions
 
-use crate::models::{CommandResult, IpResponse};
+use crate::models::{AppError, CommandResult, IpResponse};
 use reqwest::Client;
 
 /// Service for IP-related operations
@@ -37,9 +37,9 @@ impl IpService {
         {
             Ok(response) => match response.json::<IpResponse>().await {
                 Ok(ip_response) => CommandResult::success(ip_response.ip),
-                Err(e) => CommandResult::error(format!("Failed to parse IP response: {}", e)),
+                Err(e) => CommandResult::error(AppError::IpParseError(e.to_string()).to_string()),
             },
-            Err(e) => CommandResult::error(format!("Failed to fetch IP: {}", e)),
+            Err(e) => CommandResult::error(AppError::IpFetchError(e.to_string()).to_string()),
         }
     }
 }

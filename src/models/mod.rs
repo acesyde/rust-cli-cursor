@@ -1,5 +1,16 @@
 //! Common types and models used across the application
 
+use thiserror::Error;
+
+/// Custom error types for the application
+#[derive(Error, Debug)]
+pub enum AppError {
+    #[error("Failed to fetch IP: {0}")]
+    IpFetchError(String),
+    #[error("Failed to parse IP response: {0}")]
+    IpParseError(String),
+}
+
 /// Represents a command result
 #[derive(Debug)]
 pub enum CommandResult {
