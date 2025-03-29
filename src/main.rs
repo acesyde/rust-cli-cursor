@@ -44,3 +44,40 @@ async fn main() {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use models::CommandResult;
+
+    #[test]
+    fn test_hello_command_success() {
+        // Given
+        let name = "Alice";
+        let command = commands::HelloCommand::new(name.to_string());
+
+        // When
+        let result = command.execute();
+
+        // Then
+        assert!(matches!(result, CommandResult::Success(_)));
+        if let CommandResult::Success(msg) = result {
+            assert_eq!(msg, "Hello, Alice!");
+        }
+    }
+
+    #[tokio::test]
+    async fn test_ip_command_success() {
+        // Given
+        let command = commands::IpCommand::new();
+
+        // When
+        let result = command.execute().await;
+
+        // Then
+        assert!(matches!(result, CommandResult::Success(_)));
+        if let CommandResult::Success(ip) = result {
+            assert!(ip.parse::<std::net::IpAddr>().is_ok());
+        }
+    }
+}

@@ -50,7 +50,8 @@ mod tests {
     use mockito::Server;
 
     #[tokio::test]
-    async fn test_get_public_ip_success() {
+    async fn given_valid_response_when_get_public_ip_then_returns_success() {
+        // Given
         let mut server = Server::new_async().await;
         let mock = server
             .mock("GET", "/?format=json")
@@ -58,26 +59,31 @@ mod tests {
             .with_header("content-type", "application/json")
             .with_body(r#"{"ip": "1.2.3.4"}"#)
             .create();
-
         let service = IpService::with_base_url(server.url());
+
+        // When
         let result = service.get_public_ip().await;
 
+        // Then
         mock.assert();
         assert!(matches!(result, CommandResult::Success(ip) if ip == "1.2.3.4"));
     }
 
     #[tokio::test]
-    async fn test_get_public_ip_error() {
+    async fn given_error_response_when_get_public_ip_then_returns_error() {
+        // Given
         let mut server = Server::new_async().await;
         let mock = server
             .mock("GET", "/?format=json")
             .with_status(500)
             .with_body("Internal Server Error")
             .create();
-
         let service = IpService::with_base_url(server.url());
+
+        // When
         let result = service.get_public_ip().await;
 
+        // Then
         mock.assert();
         assert!(matches!(result, CommandResult::Error(_)));
     }

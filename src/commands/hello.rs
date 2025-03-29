@@ -15,7 +15,7 @@ impl HelloCommand {
 
     /// Executes the hello command
     pub fn execute(&self) -> CommandResult {
-        CommandResult::success(format!("Hello {}!", self.name))
+        CommandResult::success(format!("Hello, {}!", self.name))
     }
 }
 
@@ -25,8 +25,14 @@ mod tests {
 
     #[test]
     fn test_hello_command() {
-        let command = HelloCommand::new("John".to_string());
+        // Given
+        let name = "John".to_string();
+        let command = HelloCommand::new(name);
+
+        // When
         let result = command.execute();
-        assert!(matches!(result, CommandResult::Success(msg) if msg == "Hello John!"));
+
+        // Then
+        assert!(matches!(result, CommandResult::Success(msg) if msg == "Hello, John!"));
     }
-} 
+}
