@@ -19,6 +19,7 @@ impl IpService {
     }
 
     /// Creates a new IP service instance with a custom base URL
+    #[cfg(test)]
     pub fn with_base_url(base_url: String) -> Self {
         Self {
             client: Client::new(),

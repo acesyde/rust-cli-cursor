@@ -1,0 +1,50 @@
+# Configuration for git-cliff
+[changelog]
+# changelog header
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+"""
+# template for the version diff
+template = """
+## [{{ version | date(format="%Y-%m-%d") }}] {{ tag | upper }}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper }}{% if group %}{% if group == "unknown" %}{% else %} Changes{% endif %}{% endif %}
+{% for commit in commits %}
+- {% if commit.emoji %}{{ commit.emoji }} {% endif %}{{ commit.message | upper_first }}{% if commit.id %} ({{ commit.id }}){% endif %}{% if commit.author %}. *{{ commit.author }}{% endif %}
+{% endfor %}
+
+{% endfor %}
+"""
+# remove the selected commits from the changelog
+remove_commits = ["chore", "ci"]
+
+[git]
+# parse the commits based on https://www.conventionalcommits.org
+conventional_commits = true
+# filter out the commits that are not matched by commit-lint by itself
+filter_unconventional = false
+# process each line of a commit as an individual commit
+split_commits = false
+
+# regex for preprocessing the commit messages
+commit_preprocessors = [
+    { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#$2](https://github.com/$1/issues/$2))" }
+]
+
+# regex for parsing and grouping commits
+commit_parsers = [
+    { message = "^feat", group = "Features", emoji = "✨" },
+    { message = "^fix", group = "Bug Fixes", emoji = "🐛" },
+    { message = "^docs", group = "Documentation", emoji = "📚" },
+    { message = "^style", group = "Styling", emoji = "💎" },
+    { message = "^refactor", group = "Code Refactoring", emoji = "📦" },
+    { message = "^perf", group = "Performance Improvements", emoji = "🚀" },
+    { message = "^test", group = "Tests", emoji = "🚨" },
+    { message = "^build", group = "Build System", emoji = "🛠" },
+    { message = "^ci", group = "Continuous Integration", emoji = "⚙️" },
+    { message = "^chore", group = "Chores", emoji = "♻️" },
+    { message = "^revert", group = "Reverts", emoji = "🗑" },
+] 
